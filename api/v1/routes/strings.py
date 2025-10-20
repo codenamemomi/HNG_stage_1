@@ -18,12 +18,23 @@ def create_string(data: string_schema.StringCreate):
     return record
 
 
-@router.get("/{string_value}", response_model=string_schema.StringResponse)
-def get_string(string_value: str):
-    record = string_service.get_string_by_value(string_value)
-    if not record:
-        raise HTTPException(status_code=404, detail="String not found")
-    return record
+@router.get("/filter-by-natural-language")
+def filter_by_natural_language(query: str):
+    try:
+        filters = nlp_parser.parse_natural_query(query)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    results = string_service.get_all_strings(**filters)
+
+    return {
+        "data": results,
+        "count": len(results),
+        "interpreted_query": {
+            "original": query,
+            "parsed_filters": filters
+        }
+    }
 
 
 @router.get("", response_model=string_schema.StringListResponse)
@@ -55,23 +66,12 @@ def get_all_strings(
     }
 
 
-@router.get("/filter-by-natural-language")
-def filter_by_natural_language(query: str):
-    try:
-        filters = nlp_parser.parse_natural_query(query)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-    results = string_service.get_all_strings(**filters)
-
-    return {
-        "data": results,
-        "count": len(results),
-        "interpreted_query": {
-            "original": query,
-            "parsed_filters": filters
-        }
-    }
+@router.get("/{string_value}", response_model=string_schema.StringResponse)
+def get_string(string_value: str):
+    record = string_service.get_string_by_value(string_value)
+    if not record:
+        raise HTTPException(status_code=404, detail="String not found")
+    return record
 
 
 @router.delete("/{string_value}", status_code=204)
