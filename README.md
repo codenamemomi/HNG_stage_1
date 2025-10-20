@@ -34,8 +34,8 @@ A RESTful API built with FastAPI for analyzing and storing string properties in-
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
-   cd <project-directory>
+   git clone https://github.com/codenamemomi/HNG_stage_1
+   cd HNG_stage_1
    ```
 
 2. Create a virtual environment (recommended):
